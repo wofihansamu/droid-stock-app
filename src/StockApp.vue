@@ -12,7 +12,10 @@
     <div id="direct"></div>
     <div class="container">
       <section class="content-header">
-        <h3><span class="glyphicon glyphicon-phone"></span> Droid Stock<span id="stat" :class="onlineStatusClass">{{ onlineStatusText }}</span><small class="text-muted" id="info">{{ appVersion }}</small></h3>
+        <h3><span class="glyphicon glyphicon-phone"></span> Droid Stock <small class="text-muted" id="info">{{ appVersion }}</small>
+          <br/>
+          <span id="stat" :class="onlineStatusClass">{{ onlineStatusText }}</span>
+          </h3>
       </section>
 
       <ul class="nav nav-tabs">
@@ -35,7 +38,7 @@
 
       <div class="tab-content">
         <div v-if="activeTab === 'backup'">
-          <BackupTab ref="backupTab" />
+          <BackupTab ref="backupTab" @push-backup="pushBackup" />
         </div>
         <div v-if="activeTab === 'scan'">
           <ScanTab
@@ -63,7 +66,7 @@
           />
         </div>
         <div v-if="activeTab === 'purge'">
-          <PurgeTab @trigger-hapus="hapusData" />
+          <PurgeTab :online="online" @trigger-hapus="hapusData" />
         </div>
       </div>
     </div>
@@ -98,12 +101,19 @@ export default {
       db: null,
       backupdb: null,
       activeTab: 'scan',
-      setupData: {},
+      setupData: {
+          pos: '',
+          dwl: '',
+          date: '',
+          store: '',
+          dept: '',
+          auto: false,
+        },
       alreadyInitialized: false,
       online: false,
-      appVersion: "Ver 1.2.0",
+      appVersion: "ver 1.3.0",
       ras: "",
-      apiHost: "http://172.28.128.32:9000", // You might need to configure this based on your environment
+      apiHost: "", // You might need to configure this based on your environment
       qrReader: null,
       camContainerDisplay: 'none',
       loading: false,
@@ -147,16 +157,13 @@ export default {
       this.loading = true;
       await this.isDroid();
       await this.isOnline();
-      await this.getVersi();
       this.fillSet();
       this.keyStore();
-      this.records(); // Panggil records di sini untuk mengisi recordsCount awal
+      this.records();
       this.loading = false;
     },
     isMobileDevice() {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-      // Pola umum untuk perangkat seluler
       if (/android/i.test(userAgent)) {
         return true;
       }
@@ -201,6 +208,7 @@ export default {
         this.alreadyInitialized = true;
       } catch (err) {
         this.alreadyInitialized = false;
+        this.activeTab = 'set';
         Swal({
           title: "Informasi",
           text: "Harap Perbarui Data Terlebih dahulu",
@@ -214,20 +222,7 @@ export default {
         await fetch(`${this.apiHost}`);
         this.online = true;
       } catch (xhr) {
-        if (xhr.status === 403) {
-          window.location.href = `${this.apiHost}/stock.ras`;
-        } else {
-          this.online = false;
-        }
-      }
-    },
-    async getVersi() {
-      try {
-        const response = await fetch(`${this.apiHost}/ws.ras?dat=versi`);
-        this.ras = await response.text();
-        this.appVersion = `Ver 1.2.0 (${this.ras})`;
-      } catch (err) {
-        console.error(err);
+        this.online = false;
       }
     },
     parseURL() {
@@ -288,7 +283,7 @@ export default {
     async update() {
       const dateFormat = /^\d{2}\/\d{2}\/\d{4}$/;
       const { date, store, dept, pos, dwl } = this.setupData;
-
+      console.log(this.setupData)
       if (!date || !store || !pos || !dwl) {
         Swal("Data Tidak Lengkap", "Silahkan isi semua Data", "error");
         return;
@@ -309,7 +304,7 @@ export default {
       Swal({
         title: 'Tunggu sebentar...',
         icon: '/load_for.gif',
-        showConfirmButton: false,
+        buttons: false,
       });
 
       try {
@@ -344,7 +339,7 @@ export default {
       try {
         const doc = await this.backupdb.get('backupList');
         const listSku = JSON.stringify(doc.listFile[index].listSku);
-        this.uploadM(listSku);
+        this.unduhLocal(listSku);
       } catch (err) {
         Swal("Error", err.message, "error");
       }

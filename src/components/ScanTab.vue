@@ -12,13 +12,13 @@
           </span>
         </div>
         <label>QTY (Pcs/Kg)</label>
-        <input class="form-control" :type="qtyInputType" name="qty" id="qty" :disabled="qtyDisabled" v-model="qty" @keydown.enter.prevent="handleQtyEnter" ref="qtyInput">
+        <input class="form-control" :type="qtyInputType" name="qty" id="qty" v-model="qty" @keydown.enter.prevent="handleQtyEnter" ref="qtyInput" disabled>
         <input type="hidden" name="sku" id="sku" v-model="sku">
         <small class="text-muted" id="info">*Tekan Enter</small>
         <section id="desc" class="text-right text-danger">{{ desc }}</section>
       </div>
     </form>
-    <div class="numpad-container" id="numpad">
+    <div class="numpad-container" id="numpad" v-if="numpad">
       <button v-for="key in numpadKeys" :key="key"
               :class="['numpad-key', { 'tall': key === '↵' }]"
               @click="handleNumpadClick(key)">
@@ -43,7 +43,7 @@ export default {
       qty: '',
       sku: '',
       desc: '',
-      qtyDisabled: true,
+      numpad: false,
       numpadKeys: [
         "1", "2", "3",
         "4", "5", "6",
@@ -59,7 +59,7 @@ export default {
   },
   watch: {
     upc(newVal) {
-      this.qtyDisabled = true;
+      this.$refs.qtyInput.disabled = true
       if (newVal.length < 3) {
         this.qty = "";
       }
@@ -92,7 +92,7 @@ export default {
       }
     },
     handleUpcKeyup() {
-      this.qtyDisabled = true;
+      this.$refs.qtyInput.disabled = true;
       if (this.upc.length < 3) {
         this.qty = "";
       }
@@ -112,27 +112,23 @@ export default {
         if (result) {
           this.upc = result.SKU;
           this.sku = result.SKU;
-          this.desc = `<label>${result.NAME}</label>`;
-          this.qtyDisabled = false;
+          this.desc = result.NAME;
           this.$nextTick(() => {
-            if (this.$refs.qtyInput) {
-              this.$refs.qtyInput.focus();
-            }
+            this.$refs.qtyInput.disabled = false
+            if (this.$refs.qtyInput) this.$refs.qtyInput.focus();
           });
         } else {
           if (processedUpc.length === 8) {
             this.sku = processedUpc;
-            this.desc = "<label>SKU Tidak ditemukan</label>";
-            this.qtyDisabled = false;
+            this.desc = "SKU Tidak ditemukan";
             this.$nextTick(() => {
-              if (this.$refs.qtyInput) {
-                this.$refs.qtyInput.focus();
-              }
+              this.$refs.qtyInput.disabled = false
+              if (this.$refs.qtyInput) this.$refs.qtyInput.focus();
             });
           } else {
             this.sku = "";
             this.desc = "";
-            this.qtyDisabled = true;
+            this.$refs.qtyInput.disabled = true
             this.disableNumped();
             if (this.$refs.upcInput) {
               this.$refs.upcInput.select();
@@ -197,7 +193,7 @@ export default {
       this.sku = "";
       this.desc = "";
       this.qty = "";
-      this.qtyDisabled = true;
+      this.$refs.qtyInput.disabled = true
       this.disableNumped();
       this.$nextTick(() => {
         if (this.$refs.upcInput) {
@@ -216,10 +212,10 @@ export default {
             c++;
           }
         }
-        this.desc = `<label>posted : ${c}</label>`;
+        this.desc = `posted : ${c}`;
       } catch (err) {
         console.error(err);
-        this.desc = `<label>posted : 0</label>`;
+        this.desc = `posted : 0`;
       }
     },
     processBarcodeFromParent(barcode) {
@@ -227,9 +223,10 @@ export default {
       this.handleUpcEnter();
     },
     updateDesc(message) {
-      this.desc = `<label>${message}</label>`;
+      this.desc = `${message}`;
     },
-    getLocation(str) {
+    getLocation(loc) {
+      let str = String(loc);
       if (str.substr(0, 4) === "2100" && str.length === 13) {
         return str.substr(7, 4) * 1;
       }
@@ -238,7 +235,8 @@ export default {
       }
       return str.trim() * 1;
     },
-    isPLU(str) {
+    isPLU(upc) {
+      let str = String(upc);
       if (str.substr(0, 2) === "24" && str.length === 18) {
         return true;
       }
@@ -250,14 +248,16 @@ export default {
       }
       return false;
     },
-    getSKU(str) {
+    getSKU(upc) {
+      let str = String(upc);
       if (str.substr(0, 4) === "2100") {
         return str.substr(4, 8);
       } else {
         return str;
       }
     },
-    getPLU(str) {
+    getPLU(upc) {
+      let str = String(upc);
       const plu = this.isPLU(str);
       if (plu) {
         return str.length === 18 ? str.substr(2, 4) : str.substr(3, 4);
@@ -287,7 +287,7 @@ export default {
       }
     },
     handleNumpadClick(key) {
-      if (this.qtyDisabled) { // If qty is disabled, numpad operates on UPC
+      if (this.$refs.qtyInput.disabled) { // If qty is disabled, numpad operates on UPC
           let currentUpc = this.upc.toString();
           if (key === "C") {
               this.upc = "";
@@ -333,10 +333,10 @@ export default {
       }
     },
     disableNumped() {
-      // Logic to disable numpad visibility/interactivity if needed
+      this.numpad = false;
     },
     enableNumpad() {
-      // Logic to enable numpad visibility/interactivity if needed
+      this.numpad = true
     },
   },
 };

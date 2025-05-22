@@ -17,9 +17,9 @@
         <option value="35,36,37,68">35 36 37 68 - Groceries</option>
         <option value="35,36,37,68,34,91,98,96,97,33,99">All Dept</option>
       </select>
-      <label>Nomor POS</label>
+      <label>No. POS</label>
       <input class="form-control" type="number" name="pos" id="pos" required v-model="setup.pos" :disabled="!isSetupEditable">
-      <label>Nomor DWL</label>
+      <label>No. DWL</label>
       <select class="form-control" id="dwl" name="dwl" v-model="setup.dwl" :disabled="!isSetupEditable">
         <option value="1">1</option>
         <option value="2">2</option>
@@ -31,15 +31,15 @@
         <option value="8">8</option>
         <option value="9">9</option>
       </select>
-      <input type="checkbox" class="custom-control-input" id="autoDown" value="1" v-model="setup.auto" :disabled="!isSetupEditable">
+      <!-- <input type="checkbox" class="custom-control-input" id="autoDown" value="1" v-model="setup.auto" :disabled="!isSetupEditable">
       <label class="custom-control-label">Unduh Otomatis</label>
-      <small class="text-muted" id="info">*Jika diaktifkan, Unduh Otomatis dilakukan setiap 5 menit sekali dalam kondisi jaringan Online</small>
+      <small class="text-muted" id="info">*Jika diaktifkan, Unduh Otomatis dilakukan setiap 5 menit sekali dalam kondisi jaringan Online</small> -->
     </form>
     <br>
     <div class="form-group">
-      <button class="btn btn-danger" id="btn_unduh_local" :disabled="!canUnduhLocal" @click="$emit('trigger-unduh-local')">Unduh Local</button>
-      <button class="btn btn-warning" id="btn_unggah" :disabled="!canUnggah" @click="$emit('trigger-unggah')">Unduh File M</button>
-      <button class="btn btn-success" id="btn_unduh" :disabled="!canUnduh" @click="$emit('trigger-update')">Perbarui Data</button>
+      <button class="btn btn-danger m-1" id="btn_unduh_local" :disabled="!canUnduhLocal" @click="$emit('trigger-unduh-local')">Unduh Local</button>
+      <!-- <button class="btn btn-warning m-1" id="btn_unggah" :disabled="!canUnggah" @click="$emit('trigger-unggah')">Unduh File M</button> -->
+      <button class="btn btn-success m-1" id="btn_unduh" :disabled="!canUnduh" @click="$emit('trigger-update')">Perbarui Data</button>
     </div><br>
     <section id="records" class="text-right text-danger">Records : {{ recordsCount }}</section>
   </div>
@@ -86,7 +86,19 @@ export default {
       if (newDate) {
         this.initDatepicker();
       }
-    }
+    },
+    'setup.store': function(newVal) {
+      if (newVal) this.$emit('update-setup', { store: newVal });
+    },
+    'setup.dept': function(newVal) {
+      if (newVal) this.$emit('update-setup', { dept: newVal });
+    },
+    'setup.pos': function(newVal) {
+      if (newVal) this.$emit('update-setup', { pos: newVal });
+    },
+    'setup.dwl': function(newVal) {
+      if (newVal) this.$emit('update-setup', { dwl: newVal });
+    },
   },
   methods: {
     initDatepicker() {
@@ -111,7 +123,7 @@ export default {
     this.initDatepicker();
     if (!this.setup.date) {
       this.setup.date = moment().format('DD/MM/YYYY');
-      this.$emit('update-setup', { date: this.setup.date });
+      this.$emit('update-setup', {  date: this.setup.date });
     }
   },
 };
