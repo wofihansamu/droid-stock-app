@@ -1,4 +1,14 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue'; 
+import StockApp from './StockApp.vue';
 
-createApp(App).mount('#app')
+// Import CSS
+import './assets/css/bootstrap.min.css';
+import './assets/css/font-awesome.min.css';
+import './assets/css/sweetalert.css';
+
+// Make jQuery global for daterangepicker if needed
+import $ from 'jquery';
+window.$ = window.jQuery = $;
+
+const app = createApp(StockApp);
+app.mount('#app'); 
