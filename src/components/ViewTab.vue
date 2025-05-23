@@ -82,15 +82,35 @@ export default {
         Swal({
           title: itemToDelete.desc,
           text: "Masukkan Qty",
-          content: "input", // SweetAlert2 uses 'content' for input type, not 'type'
-          input: 'text', // SweetAlert2 uses 'input' for input type
-          inputValue: itemToDelete.qty,
-          buttons: true,
-          confirmButtonText: "Koreksi"
+          content: {
+            element: "input",
+            attributes: {
+              placeholder: "Type your password",
+              type: "text",
+              value: itemToDelete.qty
+            },
+          },
+          buttons: {
+            cancel: {
+            text: "Cancel",
+            value: null,
+            visible: true,
+            className: "",
+            closeModal: true,
+          },
+            confirm: {
+              text: "Koreksi",
+              value: true,
+              visible: true,
+              className: "",
+              closeModal: true
+            }
+          },
         })
         .then(async (val) => {
-          if (val && val.value && val.value * 1 < 99999 && val.value * 1 >= 0) { // Access value via .value
-            listResultScan[index].qty = val.value * 1;
+          console.log(val)
+          if (val && val * 1 < 99999 && val * 1 >= 0) { // Access value via .value
+            listResultScan[index].qty = val * 1;
             const id_rev = docread._rev;
             const docs = {
               listResultScan: listResultScan,
