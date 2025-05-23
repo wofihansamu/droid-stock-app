@@ -12,7 +12,7 @@
     <div id="direct"></div>
     <div class="container">
       <section class="content-header">
-        <h3><span class="glyphicon glyphicon-phone"></span> Droid Stock <small class="text-muted" id="info">{{ appVersion }}</small>
+        <h3><span class="glyphicon glyphicon-phone"></span> Droid Stock SA <small class="text-muted" id="info">{{ appVersion }}</small>
           <br/>
           <span id="stat" :class="onlineStatusClass">{{ onlineStatusText }}</span>
           </h3>
@@ -55,7 +55,7 @@
         <div v-if="activeTab === 'set'">
           <SetTab
             ref="setTab"
-            :initial-setup-data="setupData"
+            :initial-setup-data="initSetup"
             :online="online"
             :already-initialized="alreadyInitialized"
             :records-count="recordsCount"
@@ -101,6 +101,7 @@ export default {
       db: null,
       backupdb: null,
       activeTab: 'scan',
+      initSetup: {},
       setupData: {
           pos: '',
           dwl: '',
@@ -151,6 +152,8 @@ export default {
             this.$refs.backupTab.viewBackup();
           }
         });
+      } else if (tab === 'set') {
+        this.initSetup = this.setupData
       }
     },
     async getInit() {
@@ -283,7 +286,6 @@ export default {
     async update() {
       const dateFormat = /^\d{2}\/\d{2}\/\d{4}$/;
       const { date, store, dept, pos, dwl } = this.setupData;
-      console.log(this.setupData)
       if (!date || !store || !pos || !dwl) {
         Swal("Data Tidak Lengkap", "Silahkan isi semua Data", "error");
         return;

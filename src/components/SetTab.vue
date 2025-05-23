@@ -30,16 +30,13 @@
         <option value="7">7</option>
         <option value="8">8</option>
         <option value="9">9</option>
-      </select>
-      <!-- <input type="checkbox" class="custom-control-input" id="autoDown" value="1" v-model="setup.auto" :disabled="!isSetupEditable">
-      <label class="custom-control-label">Unduh Otomatis</label>
-      <small class="text-muted" id="info">*Jika diaktifkan, Unduh Otomatis dilakukan setiap 5 menit sekali dalam kondisi jaringan Online</small> -->
+      </select>      
     </form>
     <br>
     <div class="form-group">
-      <button class="btn btn-danger m-1" id="btn_unduh_local" :disabled="!canUnduhLocal" @click="$emit('trigger-unduh-local')">Unduh Local</button>
-      <!-- <button class="btn btn-warning m-1" id="btn_unggah" :disabled="!canUnggah" @click="$emit('trigger-unggah')">Unduh File M</button> -->
-      <button class="btn btn-success m-1" id="btn_unduh" :disabled="!canUnduh" @click="$emit('trigger-update')">Perbarui Data</button>
+      <button class="btn btn-primary m-1" id="btn_unduh_local" style="margin-right: 2px" :disabled="!canUnduhLocal" @click="$emit('trigger-unduh-local')">Unduh File</button>
+      <!-- <button class="btn btn-warning m-1" id="btn_unggah" :disabled="!canUnggah" @click="$emit('trigger-unggah')">Sync File M</button> -->
+      <button class="btn btn-success m-1" id="btn_unduh" style="margin-right: 2px" :disabled="!canUpdate" @click="$emit('trigger-update')">Perbarui Data</button>
     </div><br>
     <section id="records" class="text-right text-danger">Records : {{ recordsCount }}</section>
   </div>
@@ -48,16 +45,15 @@
 <script>
 import moment from 'moment';
 import 'daterangepicker';
-import '../assets/css/daterangepicker-bs3.css';
-
+import '../assets/css/daterangepicker.css';
 
 export default {
   name: 'SetTab',
-  props: ['initialSetupData', 'online', 'alreadyInitialized', 'recordsCount'], // recordsCount sekarang adalah prop
+  props: ['initialSetupData', 'online', 'alreadyInitialized', 'recordsCount'],
   data() {
     return {
-      setup: { ...this.initialSetupData },
-      // recordsCount tidak lagi di sini karena menjadi prop
+      setup: { ...this.initialSetupData || {} },
+      dateInput: null
     };
   },
   computed: {
@@ -65,66 +61,58 @@ export default {
       return !this.alreadyInitialized;
     },
     canUnduhLocal() {
-      return this.online && this.alreadyInitialized;
+      return this.alreadyInitialized;
     },
     canUnggah() {
       return this.online && this.alreadyInitialized;
     },
-    canUnduh() {
+    canUpdate() {
       return this.online && !this.alreadyInitialized;
     }
   },
   watch: {
     initialSetupData: {
       handler(newVal) {
-        this.setup = { ...newVal };
+        this.setup = newVal ? { ...newVal } : {};
       },
       deep: true,
       immediate: true,
     },
-    'setup.date': function(newDate) {
-      if (newDate) {
-        this.initDatepicker();
-      }
-    },
-    'setup.store': function(newVal) {
-      if (newVal) this.$emit('update-setup', { store: newVal });
-    },
-    'setup.dept': function(newVal) {
-      if (newVal) this.$emit('update-setup', { dept: newVal });
-    },
-    'setup.pos': function(newVal) {
-      if (newVal) this.$emit('update-setup', { pos: newVal });
-    },
-    'setup.dwl': function(newVal) {
-      if (newVal) this.$emit('update-setup', { dwl: newVal });
+    setup: {
+      handler(newVal) {
+        for (const key in newVal) {
+            this.$emit('update-setup', { [key]: newVal[key] });
+        }
+      },
+      deep: true,
     },
   },
   methods: {
     initDatepicker() {
-      // Pastikan jQuery tersedia di scope ini jika tidak global di main.js
-      window.$(this.$el).find('input[name="date"]').daterangepicker({
-        format: 'DD/MM/YYYY',
-        singleDatePicker: true,
-        showDropdowns: false,
-        startDate: this.setup.date ? moment(this.setup.date, 'DD/MM/YYYY') : moment(),
-        minDate: moment(),
-        locale: {
-          format: 'DD/MM/YYYY'
+        this.dateInput = window.$(this.$el).find('input[name="date"]');
+        if (this.dateInput.data('daterangepicker')) {
+          this.dateInput.data('daterangepicker').remove();
         }
-      }, (start) => {
-        this.setup.date = start.format('DD/MM/YYYY');
-        this.$emit('update-setup', { date: this.setup.date });
-      });
-    },
-    // Metode updateRecordsCount dihapus karena recordsCount sekarang adalah prop
+        this.dateInput.daterangepicker({
+          format: 'DD/MM/YYYY',
+          singleDatePicker: true,
+          showDropdowns: false, 
+          autoApply: true,
+          minDate: moment(), 
+          locale: { format: 'DD/MM/YYYY' }
+        });
+      }
   },
   mounted() {
-    this.initDatepicker();
     if (!this.setup.date) {
       this.setup.date = moment().format('DD/MM/YYYY');
-      this.$emit('update-setup', {  date: this.setup.date });
     }
+    this.initDatepicker();
   },
+  beforeUnmount() {
+    if (this.dateInput.data('daterangepicker')) {
+      this.dateInput.data('daterangepicker').remove();
+    }
+  }
 };
 </script>

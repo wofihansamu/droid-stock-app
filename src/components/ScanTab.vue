@@ -130,11 +130,12 @@ export default {
             this.desc = "";
             this.$refs.qtyInput.disabled = true
             this.disableNumped();
+          }
+          Swal("Not Found", `${processedUpc} : Item tidak ditemukan`, "info").then(()=>{
             if (this.$refs.upcInput) {
               this.$refs.upcInput.select();
             }
-          }
-          Swal("Not Found", `${processedUpc} : Item tidak ditemukan`, "info");
+          });
         }
       } catch (err) {
         Swal("Error", err.message, "error");

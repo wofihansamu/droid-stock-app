@@ -5,7 +5,7 @@
       <input class="form-control" type="password" name="pass" id="pass" required v-model="password">
       <small class="form-text text-muted">
         Jika anda menekan Tombol <b>Hapus Data</b> artinya anda akan menghapus semua data
-        Stock yang ada di perangkat ini, proses penghapusan data tidak dapat dibatalkan atau dikembalikan
+        Stock yang ada di perangkat ini.
       </small><br>
       <button class="btn btn-danger" id="btn_hapus" :disabled="!canDelete" @click="hapusData">Hapus Data</button>
     </div>
@@ -13,8 +13,6 @@
 </template>
 
 <script>
-import Swal from 'sweetalert'; // Pastikan Swal diimpor jika digunakan di sini
-
 export default {
   name: 'PurgeTab',
   props: ['online'],
