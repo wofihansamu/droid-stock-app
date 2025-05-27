@@ -215,14 +215,14 @@ export default {
         Swal({
           title: "Informasi",
           text: "Harap Perbarui Data Terlebih dahulu",
-          icon: `/fresh_icon.png`,
+          icon: `fresh_icon.png`,
         });
       }
       this.records();
     },
     async isOnline() {
       try {
-        await fetch(`${this.apiHost}`);
+        await fetch(`${this.apiHost}/`);
         this.online = true;
       } catch (xhr) {
         this.online = false;
@@ -305,7 +305,7 @@ export default {
 
       Swal({
         title: 'Tunggu sebentar...',
-        icon: '/load_for.gif',
+        icon: 'load_for.gif',
         buttons: false,
       });
 
@@ -471,7 +471,7 @@ export default {
         if (listSku.length) {
           Swal({
             title: 'Tunggu sebentar...',
-            icon: '/load_for.gif',
+            icon: 'load_for.gif',
             buttons: false,
           });
           try {
