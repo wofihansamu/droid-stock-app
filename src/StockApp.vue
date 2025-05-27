@@ -310,7 +310,7 @@ export default {
       });
 
       try {
-        const response = await fetch(`${this.apiHost}/ws.ras?dat=ws&dept=${dept}`);
+        const response = await fetch(`${this.apiHost}/api/item/stock?dept=${dept}`);
         const list = await response.json();
         const doc = { _id: 'listSku', listSku: list };
         await this.db.put(doc);
@@ -410,7 +410,7 @@ export default {
       try {
         const doc = await this.db.get('listResultScan');
         const listSku = doc.listResultScan;
-        this.processMAuto(listSku);
+        this.processMLocal(listSku);
       } catch (err) {
         Swal("Error", "Tidak ada Data untuk diunduh", "error");
       }
@@ -426,7 +426,7 @@ export default {
         }
       });
     },
-    processMAuto(json) {
+    processMLocal(json) {
       const sortedData = this.sort(json, "lokasi", true);
       let loc = "";
       let seq = 1;
@@ -475,7 +475,7 @@ export default {
             buttons: false,
           });
           try {
-            const response = await fetch(`${this.apiHost}/stock.ras`, {
+            const response = await fetch(`${this.apiHost}/api/item/stock`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json; charset=utf-8',
