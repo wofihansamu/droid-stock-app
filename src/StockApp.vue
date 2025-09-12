@@ -112,7 +112,7 @@ export default {
         },
       alreadyInitialized: false,
       online: false,
-      appVersion: "ver 1.3.0",
+      appVersion: "ver 1.3.1",
       ras: "",
       apiHost: "", // You might need to configure this based on your environment
       qrReader: null,
@@ -311,20 +311,26 @@ export default {
 
       try {
         const response = await fetch(`${this.apiHost}/api/item/stock?dept=${dept}`);
-        const list = await response.json();
-        const doc = { _id: 'listSku', listSku: list };
+        const lists = await response.json();
+        const doc = { _id: 'listSku', listSku: lists };
         await this.db.put(doc);
         console.log("Berhasil diperbarui");
         Swal("Berhasil", "Data Berhasil diperbarui", "success");
-      } catch (xhr) {
-        console.error(xhr);
-        try {
-          await this.db.destroy();
-        } catch (err) {
-          console.error(err);
-          Swal("DB Error", err.message, "error");
+      } catch (error) {
+        if(error.status === 404) {
+          Swal("Error 404", "API Tidak ditemukan", "error");
+        } else if(error.status === 500) {
+          Swal("Error 500", "Terjadi Kesalahan pada server", "error");
+        } else if(error.status === 0) {
+          Swal("Error", "Tidak dapat terhubung ke server", "error");
+        } else {
+          Swal("Error", error.responseText || error.statusText || error.message, "error");
+          try {
+            await this.db.destroy();
+          } catch (err) {
+            console.error(err);
+          }
         }
-        Swal("Error", JSON.stringify(xhr), "error");
       }
       this.setInit();
     },
@@ -340,7 +346,7 @@ export default {
     async pushBackup(index) {
       try {
         const doc = await this.backupdb.get('backupList');
-        const listSku = JSON.stringify(doc.listFile[index].listSku);
+        const listSku = doc.listFile[index].listSku;
         this.unduhLocal(listSku);
       } catch (err) {
         Swal("Error", err.message, "error");
@@ -406,10 +412,19 @@ export default {
         Swal("Salah", "Password Salah", "error");
       }
     },
-    async unduhLocal() {
+    async unduhLocal(overridelistSku) {
       try {
-        const doc = await this.db.get('listResultScan');
-        const listSku = doc.listResultScan;
+        let listSku = [];
+        if(overridelistSku){
+          if(overridelistSku.length === 0){
+            Swal("Error", "Tidak ada Data Backup", "error");
+            return;
+          }
+          listSku = overridelistSku;
+        }else{
+          const doc = await this.db.get('listResultScan');
+          listSku = doc.listResultScan;
+        }
         this.processMLocal(listSku);
       } catch (err) {
         Swal("Error", "Tidak ada Data untuk diunduh", "error");
