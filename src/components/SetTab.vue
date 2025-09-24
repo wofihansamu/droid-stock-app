@@ -16,6 +16,7 @@
         <option value="61,69">61 69 - Dairy and Frozen</option>
         <option value="35,36,37,68">35 36 37 68 - Groceries</option>
         <option value="35,36,37,68,34,91,98,96,97,33,99">All Dept</option>
+        <option value="35,36,37,68,34,91,98,96,97,33,99,40">All Dept (Include CSA)</option>
       </select>
       <label>No. POS</label>
       <input class="form-control" type="number" name="pos" id="pos" required v-model="setup.pos" :disabled="!isSetupEditable">
