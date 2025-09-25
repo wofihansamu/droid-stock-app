@@ -108,7 +108,7 @@ export default {
           Swal("Error", "List SKU is empty. Please update data in 'Set' tab.", "error");
           return;
         }
-        const result = doc.listSku.find(obj => obj.UPC === processedUpc);
+        const result = doc.listSku.find(obj => obj.UPC === processedUpc || obj.SKU === processedUpc);
         if (result) {
           this.upc = result.SKU;
           this.sku = result.SKU;

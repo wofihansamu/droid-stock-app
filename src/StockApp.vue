@@ -114,7 +114,7 @@ export default {
       online: false,
       appVersion: "ver 1.3.1",
       ras: "",
-      apiHost: "", // You might need to configure this based on your environment
+      apiHost: "", // You might need to configure this based on your environment (http://localhost:8085)
       qrReader: null,
       camContainerDisplay: 'none',
       loading: false,
@@ -222,7 +222,7 @@ export default {
     },
     async isOnline() {
       try {
-        await fetch(`${this.apiHost}/`);
+        await fetch(`${this.apiHost}/api/item/healtcheck`);
         this.online = true;
       } catch (xhr) {
         this.online = false;
@@ -312,10 +312,13 @@ export default {
       try {
         const response = await fetch(`${this.apiHost}/api/item/stock?dept=${dept}`);
         const lists = await response.json();
+        if(!lists.length){
+          return Swal('Data Kosong','permintaan API tidak mengembalikan data apapun','error');
+        }
         const doc = { _id: 'listSku', listSku: lists };
         await this.db.put(doc);
         console.log("Berhasil diperbarui");
-        Swal("Berhasil", "Data Berhasil diperbarui", "success");
+        Swal(lists.length + " Items", "Data Berhasil diperbarui", "success");
       } catch (error) {
         if(error.status === 404) {
           Swal("Error 404", "API Tidak ditemukan", "error");
