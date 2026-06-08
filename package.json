@@ -5,6 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "postbuild": "node scripts/zip-dist.js",
+    "zip": "node scripts/zip-dist.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -26,6 +28,7 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "archiver": "^8.0.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3"
   },
