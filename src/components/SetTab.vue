@@ -36,7 +36,7 @@
     <br>
     <div class="form-group">
       <button class="btn btn-primary m-1" id="btn_unduh_local" style="margin-right: 2px" :disabled="!canUnduhLocal" @click="$emit('trigger-unduh-local')">Unduh File</button>
-      <!-- <button class="btn btn-warning m-1" id="btn_unggah" :disabled="!canUnggah" @click="$emit('trigger-unggah')">Sync File M</button> -->
+      <button class="btn btn-warning m-1" id="btn_unggah" :disabled="!canUnggah" @click="$emit('trigger-unggah')">Unggah File</button>
       <button class="btn btn-success m-1" id="btn_unduh" style="margin-right: 2px" :disabled="!canUpdate" @click="$emit('trigger-update')">Perbarui Data</button>
     </div><br>
     <section id="records" class="text-right text-danger">Records : {{ recordsCount }}</section>
