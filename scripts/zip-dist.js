@@ -4,10 +4,15 @@ const path = require('path');
 
 const root = path.resolve(__dirname, '..');
 const distDir = path.join(root, 'dist');
+const zipDir = path.join(root, 'zip');
 
 if (!fs.existsSync(distDir)) {
   console.error('[zip-dist] dist/ folder not found. Run `npm run build` first.');
   process.exit(1);
+}
+
+if (!fs.existsSync(zipDir)) {
+  fs.mkdirSync(zipDir, { recursive: true });
 }
 
 const pkg = require(path.join(root, 'package.json'));
@@ -15,7 +20,7 @@ const pad = (n) => String(n).padStart(2, '0');
 const now = new Date();
 const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
 const zipName = `${pkg.name}-${pkg.version}-${stamp}.zip`;
-const outPath = path.join(root, 'dist', zipName);
+const outPath = path.join(zipDir, zipName);
 
 (async () => {
   const { ZipArchive } = await import('archiver');
