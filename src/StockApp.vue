@@ -112,7 +112,7 @@ export default {
         },
       alreadyInitialized: false,
       online: false,
-      appVersion: "ver 1.3.1",
+      appVersion: "ver 1.3.2",
       ras: "",
       apiHost: "", // You might need to configure this based on your environment (http://localhost:8085)
       qrReader: null,
