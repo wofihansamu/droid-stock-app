@@ -507,11 +507,12 @@ export default {
               Swal("Gagal!", "Data tidak berhasil diunggah", "error");
             }
           } catch (err) {
+            const body = document.createElement('div');
+            body.innerHTML = err.responseText || err.statusText || '';
             Swal({
               title: `Error ${err.status}`,
-              text: err.responseText || err.statusText,
-              html: true,
-              icon: "error" // Added icon for error
+              content: body,
+              icon: "error"
             });
           }
         }
